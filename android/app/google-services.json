@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "946862308565",
+    "project_id": "grocery-student",
+    "storage_bucket": "grocery-student.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:946862308565:android:c0df65950d720a6970b65c",
+        "android_client_info": {
+          "package_name": "com.example.grocery_admin_student"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCAUD-Jz-KfnvPMsW5I3SvGNm_y9f_s42U"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
