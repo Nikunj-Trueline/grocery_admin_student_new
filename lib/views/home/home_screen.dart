@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:grocery_admin_student/views/category_list/category_list_screen.dart';
 import 'package:grocery_admin_student/views/users/user_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -22,7 +23,14 @@ class _HomeScreenState extends State<HomeScreen> {
           childAspectRatio: 1 / 1.3,
           children: [
             InkWell(
-              onTap: () {},
+              onTap: () {
+                // Navigate to category list screen
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => CategoryListScreen(),
+                    ));
+              },
               child: _dashboardCard(
                   title: 'Categories',
                   value: 0,
@@ -44,7 +52,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) =>const  UserScreen(),
+                      builder: (context) => const UserScreen(),
                     ));
               },
               child: _dashboardCard(
