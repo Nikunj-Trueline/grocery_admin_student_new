@@ -62,15 +62,18 @@ class FirebaseServicies {
     String? categoryDesc,
     int? createdAt,
     String? categoryId,
+    String? existingImageUrl,
     required BuildContext context,
   }) async {
     try {
       // create timestamp;
       String? newImageUrl;
 
+      newImageUrl = existingImageUrl ?? "";
+
       log("This is called.......................");
 
-      int? timeStamp = DateTime.now().millisecondsSinceEpoch;
+      int? timeStamp = createdAt ?? DateTime.now().millisecondsSinceEpoch;
 
       if (image != null) {
         // create new path for various categories.
@@ -95,7 +98,6 @@ class FirebaseServicies {
         newImageUrl = await snapshot.ref.getDownloadURL();
 
         log(newImageUrl.toString());
-
       }
 
       // task for upload data in real time database
@@ -103,27 +105,37 @@ class FirebaseServicies {
       CategoryModel categoryModel = CategoryModel(
         name: categoryName!,
         description: categoryDesc!,
-        imageUrl: newImageUrl!,
+        imageUrl: newImageUrl,
         isActive: true,
         createdAt: timeStamp,
-
+        id: categoryId,
       );
 
-      String? categoryId = _database.ref().child("Category").push().key;
+      if (categoryModel.id == null) {
+        String? categoryId = _database.ref().child("Category").push().key;
 
-      categoryModel.id = categoryId;
+        categoryModel.id = categoryId;
 
-      _database
-          .ref()
-          .child("Category")
-          .child(categoryId!)
-          .set(categoryModel.toJson());
+        _database
+            .ref()
+            .child("Category")
+            .child(categoryId!)
+            .set(categoryModel.toJson());
 
-      print("Thank you...............");
+        print("Add categpry....");
 
-      Navigator.pop(context);
+        Navigator.pop(context);
+      } else {
+        _database
+            .ref()
+            .child("Category")
+            .child(categoryId!)
+            .update(categoryModel.toJson());
 
+        print("Update Category...");
 
+        Navigator.pop(context);
+      }
     } catch (e) {
       log(e.toString());
     }
@@ -150,8 +162,6 @@ class FirebaseServicies {
 
   Future<bool> deleteCategory({required String categoryId}) async {
     try {
-
-
       await _database.ref().child("Category").child(categoryId).remove();
 
       return true;

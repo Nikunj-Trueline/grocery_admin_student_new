@@ -10,9 +10,7 @@ class CategoryListScreen extends StatefulWidget {
 }
 
 class _CategoryListScreenState extends State<CategoryListScreen> {
-
-
-  bool isLoading= false;
+  bool isLoading = false;
 
   @override
   Widget build(BuildContext context) {
@@ -39,27 +37,37 @@ class _CategoryListScreenState extends State<CategoryListScreen> {
               return ListView.builder(
                 itemCount: snapshot.data!.length,
                 itemBuilder: (context, index) {
-                  print(snapshot.data![index].id);
+
                   final value = snapshot.data![index];
 
-                    // print(value.id);
-                    // print(value.description);
+
                   return Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: Card(
-                      child: ListTile(
-                        leading: CircleAvatar(
-                          child: Image.network(value.imageUrl),
-                        ),
-                        title: Column(
-                          children: [
-                            Text(value.name),
-                            Text(value.description),
-                          ],
-                        ),
-                        trailing: IconButton(
-                            onPressed: () {
-                              // call function for delete category.
+                    child: GestureDetector(
+                      onTap: () {
+
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => CategoryManageScreen(
+                                categoryModel: snapshot.data![index],
+                              ),
+                            ));
+                      },
+                      child: Card(
+                        child: ListTile(
+                          leading: CircleAvatar(
+                            child: Image.network(value.imageUrl),
+                          ),
+                          title: Column(
+                            children: [
+                              Text(value.name),
+                              Text(value.description),
+                            ],
+                          ),
+                          trailing: IconButton(
+                              onPressed: () {
+                                // call function for delete category.
 
                                 print(value.id.toString());
 
@@ -67,10 +75,11 @@ class _CategoryListScreenState extends State<CategoryListScreen> {
                                   isLoading = true;
                                 });
 
-                              FirebaseServicies()
-                                  .deleteCategory(categoryId: value.id!);
-                            },
-                            icon: const Icon(Icons.delete)),
+                                FirebaseServicies()
+                                    .deleteCategory(categoryId: value.id!);
+                              },
+                              icon: const Icon(Icons.delete)),
+                        ),
                       ),
                     ),
                   );
@@ -89,11 +98,11 @@ class _CategoryListScreenState extends State<CategoryListScreen> {
           Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => const CategoryManageScreen(),
+                builder: (context) =>  CategoryManageScreen(),
               ));
         },
-        child: const Icon(Icons.add),
         backgroundColor: Colors.amber.shade400,
+        child: const Icon(Icons.add),
       ),
     );
   }
