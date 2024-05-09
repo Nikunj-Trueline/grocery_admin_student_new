@@ -6,7 +6,9 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:grocery_admin_student/model/category_model.dart';
+import 'package:grocery_admin_student/model/product.dart';
 import 'package:grocery_admin_student/model/user_model.dart';
+import 'package:grocery_admin_student/views/product_list/product_list_screen.dart';
 import 'package:image_picker/image_picker.dart';
 
 class FirebaseServicies {
@@ -164,6 +166,98 @@ class FirebaseServicies {
     try {
       await _database.ref().child("Category").child(categoryId).remove();
 
+      return true;
+    } catch (e) {
+      log(e.toString());
+      return false;
+    }
+  }
+
+  // add product in database
+
+  Future<bool> addProductInDataBase(
+      {required String productName,
+      required String productDesc,
+      required BuildContext context,
+      XFile? newImage,
+      String? existingImageUrl,
+      required int stockQuantity,
+      required double price}) async {
+    try {
+      String imageUrl = "";
+
+      if (newImage != null) {
+        String filePath = "${DateTime.now().millisecondsSinceEpoch}.png";
+
+        File file = File(newImage.path);
+
+        print("----------------------------------1");
+        TaskSnapshot taskSnapshot =
+            await _storage.ref().child("Product").child(filePath).putFile(file);
+
+        print("---------------------------------2");
+
+        imageUrl = await taskSnapshot.ref.getDownloadURL();
+      }
+
+      int? timeStamp = DateTime.now().millisecondsSinceEpoch;
+
+      print("----------------------------------------3");
+      Product product = Product(
+          name: productName,
+          description: productDesc,
+          price: price,
+          stock: stockQuantity,
+          imageUrl: imageUrl,
+          inTop: false,
+          createdAt: timeStamp);
+
+      if (product.id == null) {
+        // add product in database
+
+        String? id = _database.ref().child("Products").push().key;
+
+        product.id = id;
+
+        await _database
+            .ref()
+            .child("Products")
+            .child(id!)
+            .set(product.toJson());
+      } else {
+        // update product
+      }
+
+      Navigator.pop(context);
+      return true;
+    } catch (e) {
+      log(e.toString());
+      return false;
+    }
+  }
+
+  Stream<List<Product>> getAllProduct() {
+    return _database.ref().child("Products").onValue.map((event) {
+      List<Product> productList = [];
+
+      if (event.snapshot.exists) {
+        Map<dynamic, dynamic> productMap =
+            event.snapshot.value as Map<dynamic, dynamic>;
+
+        productMap.forEach((key, value) {
+          Product product = Product.fromJson(value);
+
+          productList.add(product);
+        });
+      }
+
+      return productList;
+    });
+  }
+
+  Future<bool> deleteProduct({required String productId}) async {
+    try {
+      await _database.ref().child("Products").child(productId).remove();
       return true;
     } catch (e) {
       log(e.toString());

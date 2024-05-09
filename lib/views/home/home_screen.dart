@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:grocery_admin_student/views/category_list/category_list_screen.dart';
+import 'package:grocery_admin_student/views/product_list/product_list_screen.dart';
 import 'package:grocery_admin_student/views/users/user_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -28,7 +29,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => CategoryListScreen(),
+                      builder: (context) => const CategoryListScreen(),
                     ));
               },
               child: _dashboardCard(
@@ -38,7 +39,14 @@ class _HomeScreenState extends State<HomeScreen> {
                   image: "assets/categories.png"),
             ),
             InkWell(
-              onTap: () {},
+              onTap: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const ProductListScreen(),
+                    ));
+
+              },
               child: _dashboardCard(
                   title: 'Products',
                   value: 0,

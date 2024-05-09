@@ -24,7 +24,6 @@ class _CategoryManageScreenState extends State<CategoryManageScreen> {
       categoryDescription.text = widget.categoryModel!.description;
       existingImageUrl = widget.categoryModel!.imageUrl;
       print("Category id in initstate : ${widget.categoryModel!.id}");
-
     }
   }
 
@@ -61,7 +60,6 @@ class _CategoryManageScreenState extends State<CategoryManageScreen> {
                     //   child: Image.network("https://firebasestorage.googleapis.com/v0/b/grocery-student.appspot.com/o/Category%2F1714480387239.png?alt=media&token=a93822ec-bc09-4d55-a752-c384d6dd51dd"),
                     backgroundImage:
                         existingImageUrl != null && newImage == null
-
                             ? NetworkImage(existingImageUrl!)
                             : newImage != null
                                 ? FileImage(
@@ -95,7 +93,9 @@ class _CategoryManageScreenState extends State<CategoryManageScreen> {
                   height: 50,
                 ),
                 CustomButton(
-                    title: widget.categoryModel == null ? "Add Category" : "Update Category",
+                    title: widget.categoryModel == null
+                        ? "Add Category"
+                        : "Update Category",
                     backgroundColor: Colors.amber,
                     foregroundColor: Colors.white,
                     callback: () {
@@ -126,7 +126,7 @@ class _CategoryManageScreenState extends State<CategoryManageScreen> {
   void addCategoryInDatabase() {
     try {
       if (formKey.currentState!.validate()) {
-        if (newImage != null || existingImageUrl !=null) {
+        if (newImage != null || existingImageUrl != null) {
           setState(() {
             isLoading = true;
           });
@@ -134,7 +134,7 @@ class _CategoryManageScreenState extends State<CategoryManageScreen> {
           // data add in firebase storage and realtime database
           log("------------------------------1");
 
-           // print("categoryid : ${widget.categoryModel!.id}");
+          // print("categoryid : ${widget.categoryModel!.id}");
           FirebaseServicies().addCategory(
               image: newImage,
               categoryName: categoryName.text.toString(),

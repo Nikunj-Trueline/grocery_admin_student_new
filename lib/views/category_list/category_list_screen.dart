@@ -37,15 +37,12 @@ class _CategoryListScreenState extends State<CategoryListScreen> {
               return ListView.builder(
                 itemCount: snapshot.data!.length,
                 itemBuilder: (context, index) {
-
                   final value = snapshot.data![index];
-
 
                   return Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: GestureDetector(
                       onTap: () {
-
                         Navigator.push(
                             context,
                             MaterialPageRoute(
@@ -98,7 +95,7 @@ class _CategoryListScreenState extends State<CategoryListScreen> {
           Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) =>  CategoryManageScreen(),
+                builder: (context) => CategoryManageScreen(),
               ));
         },
         backgroundColor: Colors.amber.shade400,
