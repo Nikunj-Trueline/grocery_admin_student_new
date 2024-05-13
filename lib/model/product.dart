@@ -6,6 +6,7 @@ class Product {
   int stock;
   String imageUrl;
   int createdAt;
+  String categoryId;
   bool inTop = false;
 
   Product(
@@ -16,6 +17,7 @@ class Product {
       required this.stock,
       required this.imageUrl,
       required this.createdAt,
+        required this.categoryId,
       this.inTop = false});
 
   Map<String, dynamic> toJson() {
@@ -28,6 +30,7 @@ class Product {
       "imageUrl": imageUrl,
       "createdAt": createdAt,
       "inTop": inTop,
+      "categoryId" : categoryId
     };
   }
 
@@ -41,6 +44,7 @@ class Product {
       imageUrl: json["imageUrl"],
       createdAt: json["createdAt"],
       inTop: json["inTop"],
+      categoryId: json["categoryId"]
     );
   }
 //

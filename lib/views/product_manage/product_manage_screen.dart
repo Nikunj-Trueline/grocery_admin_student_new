@@ -2,11 +2,14 @@ import 'dart:developer';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:grocery_admin_student/firebase/firebase_servicies.dart';
+import 'package:grocery_admin_student/model/product.dart';
 import 'package:image_picker/image_picker.dart';
+import '../../model/category_model.dart';
 import '../../widget/custom_button.dart';
 
 class ProductManageScreen extends StatefulWidget {
-  const ProductManageScreen({super.key});
+  Product? product;
+  ProductManageScreen({super.key, this.product});
 
   @override
   State<ProductManageScreen> createState() => _ProductManageScreenState();
@@ -18,12 +21,39 @@ class _ProductManageScreenState extends State<ProductManageScreen> {
 
   bool isLoading = false;
 
+  String? categoryId;
+
   final formKey = GlobalKey<FormState>();
 
   final _nameController = TextEditingController();
   final _descriptionController = TextEditingController();
   final _priceController = TextEditingController();
   final _stockQuantityController = TextEditingController();
+
+  List<CategoryModel> categoryList = [];
+
+  @override
+  initState() {
+    if (widget.product != null) {
+      existingImageUrl = widget.product!.imageUrl;
+      _nameController.text = widget.product!.name;
+      _descriptionController.text = widget.product!.description;
+      _priceController.text = widget.product!.price.toString();
+      _stockQuantityController.text = widget.product!.stock.toString();
+      categoryId = widget.product!.categoryId;
+    }
+
+    getData();
+    super.initState();
+  }
+
+  Future<void> getData() async {
+    List<CategoryModel> categoriesTemp =
+        await FirebaseServicies().getCategories();
+    setState(() {
+      categoryList = categoriesTemp;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -136,9 +166,27 @@ class _ProductManageScreenState extends State<ProductManageScreen> {
                 const SizedBox(
                   height: 30,
                 ),
+                DropdownButtonFormField(
+                  value: categoryId,
+                  decoration: InputDecoration(labelText: "Select Category"),
+                  items: categoryList.map((e) {
+                    return DropdownMenuItem(
+                      value: e.id,
+                      child: Text(e.name),
+                    );
+                  }).toList(),
+                  onChanged: (value) {
+                    print(value);
+                    categoryId = value;
+                  },
+                ),
+                const SizedBox(
+                  height: 30,
+                ),
                 CustomButton(
                   backgroundColor: Colors.blue.shade300,
-                  title: 'Add Item',
+                  title:
+                      widget.product == null ? "Add Product" : "Update Product",
                   foregroundColor: Colors.white,
                   callback: () {
                     // add product
@@ -170,23 +218,25 @@ class _ProductManageScreenState extends State<ProductManageScreen> {
     try {
       if (formKey.currentState!.validate()) {
         if (_newImage != null || existingImageUrl != null) {
-
           setState(() {
             isLoading = true;
           });
 
-         bool status = await FirebaseServicies().addProductInDataBase(
+          print("--------------------------1");
+
+          bool status = await FirebaseServicies().addProductInDataBase(
               productName: _nameController.text.toString(),
+              productId: widget.product?.id,
               newImage: _newImage,
               productDesc: _descriptionController.text.toString(),
               context: context,
+              categoryId: categoryId!,
+              existingImageUrl: existingImageUrl,
+              timeStamp1: widget.product?.createdAt,
               stockQuantity: int.parse(_stockQuantityController.text),
               price: double.parse(_priceController.text));
 
-         if(status)
-           {
-             print("Snackbar............");
-           }
+          if (status) {}
         }
       }
     } catch (e) {

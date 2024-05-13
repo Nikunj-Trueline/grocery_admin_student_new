@@ -1,5 +1,4 @@
 import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:grocery_admin_student/firebase/firebase_servicies.dart';
 import '../product_manage/product_manage_screen.dart';
@@ -12,6 +11,8 @@ class ProductListScreen extends StatefulWidget {
 }
 
 class _ProductListScreenState extends State<ProductListScreen> {
+  bool checkBox = false;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -29,37 +30,64 @@ class _ProductListScreenState extends State<ProductListScreen> {
             return ListView.builder(
               itemCount: snapshot.data!.length,
               itemBuilder: (context, index) {
-                final objectofProduct = snapshot.data![index];
+                final product = snapshot.data![index];
 
-                return ListTile(
-                  leading: CircleAvatar(
-                    child: Image(
-                      image: NetworkImage(objectofProduct.imageUrl),
-                    ),
-                  ),
-                  title: Column(
-                    children: [
-                      Text("ProductName : ${objectofProduct.name}"),
-                      Text("ProductDesc : ${objectofProduct.description}"),
-                      Text("Price : ${objectofProduct.price}"),
-                      Text("Quantity : ${objectofProduct.stock}"),
-                    ],
-                  ),
-                  trailing: IconButton(
-                      onPressed: () async {
-                        try {
-                          bool delete = await FirebaseServicies()
-                              .deleteProduct(productId: objectofProduct.id!);
-                        } catch (e) {
-                          log(e.toString());
-                        }
-                      },
-                      icon: Icon(Icons.delete)),
+                return GestureDetector(
+                  onTap: () {
+                    // Navigate to product manage screen.
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ProductManageScreen(
+                            product:  snapshot.data![index],
+                          ),
+                        ));
+                  },
+                  child: ListTile(
+                      leading: CircleAvatar(
+                        child: Image(
+                          image: NetworkImage(product.imageUrl),
+                        ),
+                      ),
+                      title: Column(
+                        children: [
+                          Text("ProductName : ${product.name}"),
+                          Text("ProductDesc : ${product.description}"),
+                          Text("Price : ${product.price}"),
+                          Text("Quantity : ${product.stock}"),
+                        ],
+                      ),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Checkbox(
+                              value: snapshot.data![index].inTop,
+                              onChanged: (status) async {
+                                // print(status!);
+
+                                await FirebaseServicies().updateInTopStatus(
+                                    productId: snapshot.data![index].id!,
+                                    status: status!);
+                              }),
+                          IconButton(
+                              onPressed: () async {
+                                try {
+                                  await FirebaseServicies()
+                                      .deleteProduct(productId: product.id!);
+                                } catch (e) {
+                                  log(e.toString());
+                                }
+                              },
+                              icon: const Icon(Icons.delete)),
+                        ],
+                      )),
                 );
               },
             );
           } else {
-            return Center(child: Text("Product not found"));
+            return const Center(
+              child: Text("Product not found"),
+            );
           }
         },
       ),
@@ -70,7 +98,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
           Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => const ProductManageScreen(),
+                builder: (context) =>  ProductManageScreen(),
               ));
         },
         child: const Icon(Icons.add),

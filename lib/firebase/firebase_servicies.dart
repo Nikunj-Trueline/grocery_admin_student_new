@@ -177,14 +177,17 @@ class FirebaseServicies {
 
   Future<bool> addProductInDataBase(
       {required String productName,
+      String? productId,
       required String productDesc,
       required BuildContext context,
       XFile? newImage,
       String? existingImageUrl,
       required int stockQuantity,
+      required String categoryId,
+      int? timeStamp1,
       required double price}) async {
     try {
-      String imageUrl = "";
+      String imageUrl = existingImageUrl?? "";
 
       if (newImage != null) {
         String filePath = "${DateTime.now().millisecondsSinceEpoch}.png";
@@ -200,17 +203,19 @@ class FirebaseServicies {
         imageUrl = await taskSnapshot.ref.getDownloadURL();
       }
 
-      int? timeStamp = DateTime.now().millisecondsSinceEpoch;
+      int? timeStamp = timeStamp1 ?? DateTime.now().millisecondsSinceEpoch;
 
       print("----------------------------------------3");
       Product product = Product(
+          id: productId,
           name: productName,
           description: productDesc,
           price: price,
           stock: stockQuantity,
           imageUrl: imageUrl,
           inTop: false,
-          createdAt: timeStamp);
+          createdAt: timeStamp,
+          categoryId: categoryId);
 
       if (product.id == null) {
         // add product in database
@@ -226,6 +231,11 @@ class FirebaseServicies {
             .set(product.toJson());
       } else {
         // update product
+        await _database
+            .ref()
+            .child("Products")
+            .child(productId!)
+            .update(product.toJson());
       }
 
       Navigator.pop(context);
@@ -263,6 +273,32 @@ class FirebaseServicies {
       log(e.toString());
       return false;
     }
+  }
+
+  Future<void> updateInTopStatus(
+      {required String productId, required bool status}) async {
+    await _database
+        .ref()
+        .child("Products")
+        .child(productId)
+        .update({"inTop": status});
+  }
+
+  Future<List<CategoryModel>> getCategories() async {
+    DataSnapshot snapshot = await _database.ref().child("Category").get();
+
+    List<CategoryModel> categoryList = [];
+
+    if (snapshot.exists) {
+      Map categoriesMap = snapshot.value as Map<dynamic, dynamic>;
+      categoriesMap.forEach((key, value) {
+        CategoryModel model = CategoryModel.fromJson(value);
+
+        categoryList.add(model);
+      });
+    }
+
+    return categoryList;
   }
 }
 
